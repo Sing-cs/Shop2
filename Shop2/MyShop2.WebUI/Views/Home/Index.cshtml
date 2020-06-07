@@ -1,31 +1,41 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿@model MyShop2.Core.ViewModels.HomeIndexViewModel
+
+@{
+    ViewBag.Title = "Index";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+<h2>Products</h2>
 
 <div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+
+    <div class="col-md-2">
+        <div class="list-group">
+            @Html.ActionLink("All", "Index", null, new { @class = Request["Category"] == null ? "list-group-item active" : "list-group-item" })
+            @foreach (var item in Model.ProductCategories)
+            {
+                @Html.ActionLink(item.Name, "Index", new { Category = item.Name }, new { @class = Request["Category"] == item.Name ? "list-group-item active" : "list-group-item" })
+            }
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+
+    <div class="col-md-10">
+        @foreach (var item in Model.Products)
+        {
+            @ShowProduct(item.Id, item.Name, item.Description, item.Price, item.Image)
+        }
     </div>
 </div>
+
+@helper ShowProduct(string Id, string Name, string Desc, decimal Price, string ImageFile)
+{
+    <div class="card col-md-4">
+        <img src="~/Content/ProductImages/@ImageFile" class="card-img-top" alt="Image" style="max-height:200px">
+        <div class="card-body">
+            <h5 class="card-title">@Name</h5>
+            <p class="card-text">@Desc</p>
+            <h5>@string.Format("{0:c}", Price)</h5>
+            <a href="@Url.Action("AddToBasket","Basket",new { ProductId = Id})" class="btn btn-primary">Add to basket</a>
+        </div>
+    </div>
+}
+

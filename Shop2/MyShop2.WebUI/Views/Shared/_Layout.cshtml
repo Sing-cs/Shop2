@@ -24,8 +24,13 @@
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    @if (Request.IsAuthenticated && User.IsInRole("Admin"))
+                    {
+                        Html.RenderAction("Index", "AdminNav");
+                    }
                 </ul>
                 @Html.Partial("_LoginPartial")
+                @{Html.RenderAction("BasketSummary", "Basket");}
             </div>
         </div>
     </div>

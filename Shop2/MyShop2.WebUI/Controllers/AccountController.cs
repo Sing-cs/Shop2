@@ -8,6 +8,8 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
+using MyShop2.Core.Contracts;
+using MyShop2.Core.Models;
 using MyShop2.WebUI.Models;
 
 namespace MyShop2.WebUI.Controllers
@@ -17,15 +19,21 @@ namespace MyShop2.WebUI.Controllers
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
+        IRepository<Customer> customerContext;
 
-        public AccountController()
-        {
-        }
+        //public AccountController()
+        //{
+        //}
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        //public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        //{
+        //    UserManager = userManager;
+        //    SignInManager = signInManager;
+        //}
+
+            public AccountController(IRepository<Customer> customerContext)
         {
-            UserManager = userManager;
-            SignInManager = signInManager;
+            this.customerContext = customerContext;
         }
 
         public ApplicationSignInManager SignInManager
@@ -155,6 +163,19 @@ namespace MyShop2.WebUI.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    Customer customer = new Customer()
+                    {
+                        UserId = user.Id,
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                        Email = model.Email,
+                        Address = model.Address
+                    };
+
+                    customerContext.Insert(customer);
+                    customerContext.Commit();
+
+
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
